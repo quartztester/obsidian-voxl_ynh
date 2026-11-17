@@ -74,7 +74,7 @@ ram.runtime = "800M"
     # Decoy source kept only so the update bot tracks voxl releases; scripts/_common.sh
     # pins the same crate and builds it on the box.
     [resources.sources.voxl]
-    format = "raw"
+    format = "whatever"
 
     url = "https://static.crates.io/crates/voxl-server/voxl-server-0.3.5.crate"
     sha256 = "84763b5eeb371b86932896e93a91c874a6b48caaf31880d1e58e0a42ef927fa2"
@@ -99,5 +99,6 @@ ram.runtime = "800M"
     [resources.apt]
     # Electron runtime + the X11 stack + the build deps of the streaming server voxl
     # (scripts/_common.sh builds it from the pinned crate; Debian does not package voxl).
+    # No VA-API driver: voxl encodes on the CPU and it is amd64-only anyway.
     # The t64 packages on trixie provide these bookworm names, so one list covers both.
-    packages = "xvfb, x11-utils, openbox, libva2, intel-media-va-driver, libgtk-3-0, libnss3, libatk-bridge2.0-0, libasound2, libgbm1, libxss1, libx11-xcb1, libxcb-dri3-0, libxcomposite1, libxdamage1, libxrandr2, libdrm2, libcups2, libpango-1.0-0, libcairo2, fonts-dejavu-core, tint2, libclang-dev, pkg-config, libx264-dev, libyuv-dev, libopus-dev, libpulse-dev, esbuild"
+    packages = "xvfb, x11-utils, openbox, libgtk-3-0, libnss3, libatk-bridge2.0-0, libasound2, libgbm1, libxss1, libx11-xcb1, libxcb-dri3-0, libxcomposite1, libxdamage1, libxrandr2, libdrm2, libcups2, libpango-1.0-0, libcairo2, fonts-dejavu-core, tint2, libclang-dev, pkg-config, libx264-dev, libyuv-dev, libopus-dev, libpulse-dev, esbuild"
