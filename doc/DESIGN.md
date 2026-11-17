@@ -21,10 +21,10 @@ Anything not mentioned below is standard YunoHost boilerplate identical in most 
   voxl releases — the real pin is duplicated in `scripts/_common.sh` L9-L10.
 - **Runtime:** Electron (no build); voxl built on the box with cargo (`_common.sh` L34-L67):
   crate fetched and sha256-checked, rustup toolchain 1.85.1 installed under a scratch
-  `$RUSTUP_HOME` because Debian bookworm's rustc 1.63 predates voxl's dependency tree,
+  `$RUSTUP_HOME` because Debian bookworm's cargo 1.63 cannot parse the crate's v4 lock file,
   build deps via `[resources.apt]`. Binary lands in `$install_dir/voxl`, owned by `$app`.
 - **Services:** one unit; start.sh runs Xvfb, openbox, tint2, voxl, and a supervisor loop
-  restarting Obsidian while the display lives (`conf/start.sh` L30-L42).
+  restarting Obsidian while the display lives (`conf/start.sh` L31-L43).
 - **Storage:** no DB; vault in `$data_dir/vault`, uploads via voxl's file panel into
   `$data_dir/vault/attachments`.
 - **Auth:** ldap/sso `not_relevant`; access is the YunoHost permission on `/`.
@@ -45,7 +45,7 @@ Anything not mentioned below is standard YunoHost boilerplate identical in most 
 - `--allowed-hosts=__DOMAIN__`: without it voxl 403s every proxied request
   (DNS-rebinding guard) — `conf/start.sh` L25-L27.
 - voxl needs the crate built with `--locked` and rustup ≥1.85; "simplifying" to apt
-  rustc breaks the build on bookworm — `scripts/_common.sh` L57-L63.
+  rustc breaks the build on bookworm (v4 lock file) — `scripts/_common.sh` L57-L63.
 - The vault registry seed runs only at install after `Local State` exists
   (`scripts/install` L43-L53); moving it earlier writes a config Obsidian overwrites.
 - `ram.build = "1G"` is for the voxl cargo build, not Obsidian — do not trim.

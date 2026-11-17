@@ -8,7 +8,7 @@
 # during install; the crate is pinned by sha256 below.
 voxl_version="0.3.5"
 voxl_sha256="84763b5eeb371b86932896e93a91c874a6b48caaf31880d1e58e0a42ef927fa2"
-# Debian bookworm's rustc predates voxl's dependency tree; pin the official toolchain.
+# Bookworm's cargo cannot parse the crate's lock file (version 4); pin a newer toolchain.
 rust_version="1.85.1"
 
 ynh_obsidian_deploy() {
@@ -54,7 +54,7 @@ ynh_obsidian_install_voxl() {
     tar xzf "$crate" -C "$build_dir"
     rm -f "$crate"
 
-    # Stock rustc predates voxl's dependencies: install a pinned rustup toolchain.
+    # Stock cargo rejects the v4 lock file: install a pinned rustup toolchain.
     export RUSTUP_HOME="$build_dir/rustup" CARGO_HOME="$build_dir/cargo"
     curl -fsSL https://sh.rustup.rs -o "$build_dir/rustup-init"
     sh "$build_dir/rustup-init" --yes --profile minimal --default-toolchain "$rust_version" --no-modify-path
