@@ -35,7 +35,8 @@ Anything not mentioned below is standard YunoHost boilerplate identical in most 
   nginx is the single door.
 - **Scheduler:** none.
 - **Migration:** none yet; `resolution` setting re-derived when missing
-  (`_common.sh` L16-L21) covers upgrade/restore from older settings.
+  (`scripts/_common.sh` L16-L20) covers upgrade/restore from older settings.
+  `change_url` re-renders the launcher with the new domain and restarts the session.
 - **Sandboxing:** Obsidian runs `--no-sandbox --disable-gpu --disable-dev-shm-usage`
   as the app user (Electron under Xvfb); voxl drops nothing — it refuses host names
   outside `--allowed-hosts=__DOMAIN__` (`conf/start.sh` L25-L27).
@@ -44,7 +45,8 @@ Anything not mentioned below is standard YunoHost boilerplate identical in most 
 
 ## Don't break
 - `--allowed-hosts=__DOMAIN__`: without it voxl 403s every proxied request
-  (DNS-rebinding guard) — `conf/start.sh` L25-L27.
+  (DNS-rebinding guard) — `conf/start.sh` L25-L27. The flag is baked into
+  `$install_dir/start.sh`, so `scripts/change_url` must keep re-rendering it.
 - voxl needs the crate built with `--locked` and rustup ≥1.85; "simplifying" to apt
   rustc breaks the build on bookworm (v4 lock file) — `scripts/_common.sh` L57-L63.
 - The vault registry seed runs only at install after `Local State` exists

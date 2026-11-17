@@ -15,6 +15,18 @@ ynh_script_progression "Updating NGINX web server configuration..."
 ynh_config_change_url_nginx
 
 #=================================================
+# RESTART THE SESSION ON THE NEW HOST NAME
+#=================================================
+# voxl only answers for the host named in --allowed-hosts: re-render the launcher
+# with the new domain and restart, or the moved URL gets a 403.
+ynh_script_progression "Restarting the streamed session..."
+
+export domain="$new_domain"
+ynh_config_add --template="start.sh" --destination="$install_dir/start.sh"
+chmod 755 "$install_dir/start.sh"
+ynh_systemctl --service="$app" --action="restart"
+
+#=================================================
 # END OF SCRIPT
 #=================================================
 
