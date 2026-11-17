@@ -57,10 +57,12 @@ ynh_obsidian_install_voxl() {
     # Stock cargo rejects the v4 lock file: install a pinned rustup toolchain.
     export RUSTUP_HOME="$build_dir/rustup" CARGO_HOME="$build_dir/cargo"
     curl -fsSL https://sh.rustup.rs -o "$build_dir/rustup-init"
-    sh "$build_dir/rustup-init" --yes --profile minimal --default-toolchain "$rust_version" --no-modify-path
+    sh "$build_dir/rustup-init" --yes --profile minimal --default-toolchain "$rust_version" --no-modify-path >/dev/null 2>&1
     export PATH="$CARGO_HOME/bin:$PATH"
 
-    (cd "$build_dir/voxl-server-$voxl_version" && cargo build --release --locked)
+    # cargo writes progress to stderr; yunohost counts stderr as warnings and
+    # package_check fails the test on the flood, so build quietly on stdout.
+    (cd "$build_dir/voxl-server-$voxl_version" && cargo build --release --locked --quiet 2>&1)
     install -m 755 "$build_dir/voxl-server-$voxl_version/target/release/voxl" "$install_dir/voxl"
     chown "$app:$app" "$install_dir/voxl"
     rm -rf "$build_dir"
