@@ -10,8 +10,9 @@ Anything not mentioned below is standard YunoHost boilerplate identical in most 
 - **Install:** questions → `ynh_setup_source` (Obsidian tarball) → build voxl from the
   pinned crate → vault seed → nginx + systemd → start, seed the vault registry once
   the profile exists, restart.
-- **Upgrade:** same deploy `--full_replace`; voxl rebuilds only when the installed
-  binary reports a different version; vault and settings survive untouched.
+- **Upgrade:** same deploy `--full_replace`, with the built `$install_dir/voxl` moved
+  aside and restored around it (`scripts/upgrade` L15-L25); the vault-then-rebuild
+  guard in `_common.sh` is the fallback; vault and settings survive untouched.
 - **Backup/restore:** `$install_dir` (includes the built `voxl` binary), `$data_dir`,
   nginx and systemd files; restore re-checks the binary and rebuilds if absent.
 
@@ -50,5 +51,8 @@ Anything not mentioned below is standard YunoHost boilerplate identical in most 
   (`scripts/install` L43-L53); moving it earlier writes a config Obsidian overwrites.
 - `ram.build = "1G"` is for the voxl cargo build, not Obsidian — do not trim.
 - Build is per-instance and survives backup via `$install_dir`; a restore onto a new
-  arch rebuilds because the guard checks `voxl --version`, not the arch
-  (`scripts/_common.sh` L32-L35).
+  arch rebuilds only if the restored binary cannot execute — the guard runs
+  `voxl --version` (`scripts/_common.sh` L36), so a foreign-arch binary on a
+  binfmt-emulated host could slip through.
+- `--full_replace` deletes the built binary; the move-aside in `scripts/upgrade`
+  is what keeps upgrades fast. Removing it silently adds a full recompile per upgrade.

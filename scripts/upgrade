@@ -12,7 +12,18 @@ source /usr/share/yunohost/helpers
 #=================================================
 ynh_script_progression "Upgrading source files..."
 
+# --full_replace wipes $install_dir, which holds the built voxl binary: carry it over
+# so a routine Obsidian bump does not recompile voxl on every upgrade.
+if [ -x "$install_dir/voxl" ]; then
+    mv "$install_dir/voxl" "/tmp/voxl-$app"
+fi
+
 ynh_obsidian_deploy --full_replace
+
+if [ -x "/tmp/voxl-$app" ]; then
+    install -m 755 -o "$app" -g "$app" "/tmp/voxl-$app" "$install_dir/voxl"
+    rm -f "/tmp/voxl-$app"
+fi
 
 ynh_obsidian_install_voxl
 ynh_obsidian_prepare_vault
