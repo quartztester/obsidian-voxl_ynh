@@ -1,0 +1,59 @@
+#!/bin/bash
+
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_script_progression "Setting up source files..."
+
+ynh_obsidian_deploy
+ynh_obsidian_install_voxl
+
+#=================================================
+# PREPARE THE VAULT
+#=================================================
+ynh_script_progression "Preparing the vault..."
+
+ynh_obsidian_prepare_vault
+
+#=================================================
+# SYSTEM CONFIGURATION
+#=================================================
+ynh_script_progression "Adding system configurations related to $app..."
+
+ynh_config_add_nginx
+
+ynh_config_add_systemd
+
+yunohost service add "$app" --description="Obsidian desktop session" --log="/var/log/$app/$app.log"
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression "Starting $app's systemd service..."
+
+ynh_systemctl --service="$app" --action="start"
+
+# The very first launch resets the vault registry: seed it once the profile exists, then restart.
+for _ in $(seq 60); do
+    [ -f "$data_dir/.config/obsidian/Local State" ] && break
+    sleep 0.5
+done
+sleep 3
+vault_id=$(ynh_string_random --length=16 --filter=0-9a-f)
+echo "{\"vaults\":{\"$vault_id\":{\"path\":\"$data_dir/vault\",\"ts\":$(date +%s)000,\"open\":true}}}" \
+    > "$data_dir/.config/obsidian/obsidian.json"
+chown "$app:$app" "$data_dir/.config/obsidian/obsidian.json"
+ynh_systemctl --service="$app" --action="restart"
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression "Installation of $app completed"

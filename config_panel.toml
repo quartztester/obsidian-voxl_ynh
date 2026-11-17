@@ -1,0 +1,22 @@
+#:schema https://github.com/YunoHost/apps/raw/main/schemas/config_panel.v1.schema.json
+
+version = "1.0"
+
+[main]
+name.en = "Session"
+name.fr = "Session"
+services = ["__APP__"]
+
+    [main.display]
+    name.en = "Display"
+    name.fr = "Affichage"
+
+        [main.display.resolution]
+        ask.en = "Desktop size"
+        ask.fr = "Taille du bureau"
+        help.en = "Starting size of the streamed desktop, as WIDTHxHEIGHT. The stream then adapts to your browser window."
+        help.fr = "Taille de départ du bureau diffusé, au format LARGEURxHAUTEUR. Le flux s'adapte ensuite à la fenêtre du navigateur."
+        type = "string"
+        bind = "settings"
+        pattern.regexp = '^[0-9]{3,4}x[0-9]{3,4}$'
+        pattern.error = "Expected a size such as 1920x1080"

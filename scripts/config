@@ -1,0 +1,16 @@
+#!/bin/bash
+
+source /usr/share/yunohost/helpers
+
+ynh_abort_if_errors
+
+# The desktop size lives in the launcher, so re-render it after settings are applied.
+# The panel's services list then restarts the app so the new size takes effect.
+ynh_app_config_apply() {
+    _ynh_app_config_apply
+    ynh_config_add --template="start.sh" --destination="$install_dir/start.sh"
+    chmod 755 "$install_dir/start.sh"
+    chown "$app:$app" "$install_dir/start.sh"
+}
+
+ynh_app_config_run "$1"
